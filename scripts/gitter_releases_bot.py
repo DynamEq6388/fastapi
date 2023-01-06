@@ -24,8 +24,7 @@ def get_github_graphql(tag_name: str):
       }
     }
     """
-    github_graphql = github_graphql.replace("{{tag_name}}", tag_name)
-    return github_graphql
+    return github_graphql.replace("{{tag_name}}", tag_name)
 
 
 def get_github_release_text(tag_name: str):

@@ -233,8 +233,7 @@ def generate_readme_content():
     message = template.render(sponsors=sponsors)
     pre_content = content[:pre_end]
     post_content = content[post_start:]
-    new_content = pre_content + message + post_content
-    return new_content
+    return pre_content + message + post_content
 
 
 @app.command()
@@ -278,11 +277,11 @@ def build_all():
     typer.echo("Building docs for: en")
     subprocess.run(["mkdocs", "build", "--site-dir", site_path], check=True)
     os.chdir(current_dir)
-    langs = []
-    for lang in get_lang_paths():
-        if lang == en_docs_path or not lang.is_dir():
-            continue
-        langs.append(lang.name)
+    langs = [
+        lang.name
+        for lang in get_lang_paths()
+        if lang != en_docs_path and lang.is_dir()
+    ]
     cpu_count = os.cpu_count() or 1
     process_pool_size = cpu_count * 4
     typer.echo(f"Using process pool size: {process_pool_size}")
@@ -414,8 +413,7 @@ def get_key_section(
 def get_text_with_translate_missing(text: str) -> str:
     lines = text.splitlines()
     lines.insert(1, missing_translation_snippet)
-    new_text = "\n".join(lines)
-    return new_text
+    return "\n".join(lines)
 
 
 def get_file_to_nav_map(nav: list) -> Dict[str, Tuple[str, ...]]:
