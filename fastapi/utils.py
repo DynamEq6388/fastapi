@@ -32,7 +32,7 @@ def is_body_allowed_for_status_code(status_code: Union[int, str, None]) -> bool:
     }:
         return True
     current_status_code = int(status_code)
-    return not (current_status_code < 200 or current_status_code in {204, 304})
+    return current_status_code >= 200 and current_status_code not in {204, 304}
 
 
 def get_model_definitions(
@@ -45,7 +45,7 @@ def get_model_definitions(
         m_schema, m_definitions, m_nested_models = model_process_schema(
             model, model_name_map=model_name_map, ref_prefix=REF_PREFIX
         )
-        definitions.update(m_definitions)
+        definitions |= m_definitions
         model_name = model_name_map[model]
         if "description" in m_schema:
             m_schema["description"] = m_schema["description"].split("\f")[0]
@@ -153,7 +153,7 @@ def generate_operation_id_for_path(
     )
     operation_id = name + path
     operation_id = re.sub(r"\W", "_", operation_id)
-    operation_id = operation_id + "_" + method.lower()
+    operation_id = f"{operation_id}_{method.lower()}"
     return operation_id
 
 
@@ -161,7 +161,7 @@ def generate_unique_id(route: "APIRoute") -> str:
     operation_id = route.name + route.path_format
     operation_id = re.sub(r"\W", "_", operation_id)
     assert route.methods
-    operation_id = operation_id + "_" + list(route.methods)[0].lower()
+    operation_id = f"{operation_id}_{list(route.methods)[0].lower()}"
     return operation_id
 
 
